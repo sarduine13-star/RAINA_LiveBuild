@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="manifest" href="manifest.json">
+  <link rel="icon" href="static/icon.png">
+  <title>RAINA Voice Assistant</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: #0b0b0b;
+      color: #f0f0f0;
+      text-align: center;
+      margin: 0;
+      padding: 20px;
+    }
+    button {
+      background: #6f00ff;
+      color: #fff;
+      border: none;
+      padding: 12px 25px;
+      border-radius: 50%;
+      font-size: 1.5rem;
+      cursor: pointer;
+      transition: 0.2s ease-in-out;
+    }
+    button:hover {
+      background: #9b4dff;
+      transform: scale(1.05);
+    }
+    .chatbox {
+      max-width: 600px;
+      margin: 20px auto;
+      text-align: left;
+      background: #111;
+      padding: 15px;
+      border-radius: 10px;
+      box-shadow: 0 0 10px #6f00ff40;
+      height: 60vh;
+      overflow-y: auto;
+    }
+    .user, .raina {
+      margin: 10px 0;
+      padding: 10px;
+      border-radius: 10px;
+      word-wrap: break-word;
+    }
+    .user { background: #222; color: #fff; text-align: right; }
+    .raina { background: #1a1a1a; color: #0ff; text-align: left; }
+  </style>
+</head>
+<body>
+  <h2>RAINA — Voice Assistant</h2>
+  <div class="chatbox" id="chat"></div>
+  <button id="mic">🎤</button>
+
+  <script>
+    const apiUrl = "https://raina-livebuild.onrender.com/api/raina_chat";
+    const chat = document.getElementById("chat");
+    const mic = document.getElementById("mic");
+
+    async function recordAndSend() {
+      const text = prompt("Speak or type your message:");
+      if (!text) return;
+      addMsg("user", text);
+
+      try {
+        const res = await fetch(apiUrl, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ message: text }),
+        });
+
+        const data = await res.json();
+        if (data.response || data.text) {
+          const reply = data.response || data.text;
+          addMsg("raina", reply);
+
+          if (data.audio_file) {
+            const audio = new Audio(`${apiUrl.replace("/api/raina_chat", "")}/${data.audio_file}`);
+            audio.play();
+          }
+        } else {
+          addMsg("raina", "No response received.");
+        }
+      } catch (err) {
+        addMsg("raina", "Error connecting to RAINA backend.");
+        console.error(err);
+      }
+    }
+
+    function addMsg(role, text) {
+      const div = document.createElement("div");
+      div.className = role;
+      div.innerText = text;
+      chat.appendChild(div);
+      chat.scrollTop = chat.scrollHeight;
+    }
+
+    mic.onclick = recordAndSend;
+  </script>
+</body>
+</html>
