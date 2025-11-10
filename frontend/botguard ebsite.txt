@@ -1,0 +1,108 @@
+Here’s a **single clean copy-ready file** containing the full **BotGuard Pro Phase 2 Extended Build** text: tier descriptions, benefit-focused messaging, and optional technical details.
+You can paste this straight into your site CMS or page builder.
+
+---
+
+## **BotGuard Pro — AI-Ready Firewall for Modern Websites**
+
+### **Hero**
+
+**Headline:**
+
+> Ditch legacy antivirus. Dominate threats in real time.
+
+**Sub-line:**
+
+> Faster sites. Cleaner analytics. Stronger protection.
+> One subscription. Instant deployment.
+
+---
+
+## **Pricing & Plans**
+
+| Tier                 | Price             | Key Benefits                                                                                                             |
+| -------------------- | ----------------- | ------------------------------------------------------------------------------------------------------------------------ |
+| **7-Day Free Trial** | **$0**            | Full access for seven days. Cancel anytime. Credit card required to activate but no charge until day 8.                  |
+| **Pay-As-You-Go**    | **$9.99 / mo**    | Covers 25 000 requests per month. Auto-metered at $0.25 per 1 000 requests over that. Ideal for personal sites or blogs. |
+| **Pro Defense**      | **$29.99 / mo**   | 3 domains, advanced AI firewall, real-time analytics dashboard, content-scrape defense, email alerts.                    |
+| **Enterprise Armor** | **$79.99 / mo**   | 10 domains, adaptive-learning AI, custom rules, full API access, telemetry export, dedicated support.                    |
+| **Lifetime Defense** | **$375 one-time** | Permanent license. All future updates, all features. Non-commercial personal or agency use.                              |
+
+---
+
+## **What You Gain**
+
+* **Speed & Uptime:** Block junk traffic before it hits your server.
+* **Accurate Analytics:** Filter out bots so marketing metrics stay real.
+* **SEO Integrity:** Prevent scraper duplication and false crawlers.
+* **Lower Ad Spend:** Stop fake impressions and click-farms.
+* **Peace of Mind:** Real-time protection, 24 / 7 monitoring.
+
+---
+
+## **How It Works**
+
+1. Visitor request enters your site.
+2. BotGuard Pro inspects headers, IP reputation, and behavior.
+3. Good traffic passes instantly; bad traffic is blocked or throttled.
+4. Logs feed into your dashboard and global threat-intel pool.
+
+---
+
+## **For Developers / Security Teams**
+
+| Protection                          | Description                                           |
+| ----------------------------------- | ----------------------------------------------------- |
+| **SQL Injection (SQLi)**            | Detects and blocks malicious query strings.           |
+| **Cross-Site Scripting (XSS)**      | Sanitizes payloads before execution.                  |
+| **CSRF / RFI / XXE**                | Shields against common OWASP Top-10 exploits.         |
+| **Spam & Form Abuse**               | Stops automated submissions and fake sign-ups.        |
+| **Brute-Force Protection**          | Rate-limits login attempts.                           |
+| **Fake Crawler Detection**          | Validates user-agents and fingerprints bots.          |
+| **Anti-Scraping Engine**            | Blocks data-harvesting and content theft.             |
+| **Adaptive AI Learning (Pro + Up)** | Learns new attack patterns from anonymized telemetry. |
+
+---
+
+## **Threat Intelligence**
+
+> Every blocked event is logged, anonymized, and analyzed.
+> This data powers smarter global protection and can be licensed to enterprise partners.
+
+---
+
+## **Spin-to-Win Promo**
+
+* One spin per verified email/IP.
+* Odds: 5 % free month, 10 % 25 % off 3 months, 15 % 10 % off 1 month, 70 % no win.
+* Winners auto-apply coupons at checkout; losers get a free-trial CTA.
+* Stripe manages coupons, trials, upgrades, and lifetime unlocks.
+
+---
+
+## **Billing Logic**
+
+* 7-Day Trial → auto-convert to plan unless cancelled.
+* Overages at $0.25 / 1 000 requests.
+* Webhooks manage subscription status, upgrades, and cancellations.
+* Lifetime customers tagged in Stripe metadata for permanent access.
+
+---
+
+## **Deployment Notes**
+
+* **FastAPI backend** for low-latency API and webhook processing.
+* **Render hosting** (Hobby plan $7 +) with auto-deploy on commit.
+* **Brevo** integration for onboarding emails and upsells.
+* **Analytics logging** in JSON for external BI tools.
+
+---
+
+### **Footer**
+
+> © 2025 Redwine Innovations — BotGuard Pro.
+> Made in America for those who build online without fear.
+
+---
+
+Copy that entire block into your web editor or export it as `botguard_pro_site_content.md`; all sections are self-contained and ready for front-end binding.
