@@ -44,4 +44,10 @@ async def stripe_webhook(request: Request):
             "plan": plan_id
         })
 
+        # 📧 Brevo onboarding via Make
+        httpx.post("https://hook.us2.make.com/s0ltqnyowhi7gkx242ttp8602957t79a", json={
+            "email": email,
+            "plan": plan_id
+        })
+
     return {"status": "ok"}
