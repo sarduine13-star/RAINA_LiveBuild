@@ -1,5 +1,6 @@
 fastapi
 uvicorn
 openai
+pygame
+gtts
 python-dotenv
-requests
