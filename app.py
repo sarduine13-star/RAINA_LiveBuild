@@ -5,17 +5,52 @@ from dotenv import load_dotenv
 import requests
 import os
 
+# --------------------------------------------------
 # Load environment variables
+# --------------------------------------------------
+# Use Render’s injected environment variables when deployed.
+# Local override only if file exists.
 load_dotenv(dotenv_path=r"C:\RAINA_LiveBuild\.env", override=True)
 
-app = FastAPI()
+# --------------------------------------------------
+# Initialize FastAPI
+# --------------------------------------------------
+app = FastAPI(
+    title="RAINA Live API",
+    description="Backend service for RAINA automation and BotGuardPro integration.",
+    version="1.0.0"
+)
 
-# Request model
+# --------------------------------------------------
+# Health Check Route
+# --------------------------------------------------
+@app.get("/")
+def root():
+    """
+    Health route for Render / uptime checks.
+    Does not expose secrets or logic.
+    """
+    return {
+        "status": "RAINA Live",
+        "endpoint": "/api/raina_chat",
+        "message": "Backend operational and connected."
+    }
+
+# --------------------------------------------------
+# Chat Request Model
+# --------------------------------------------------
 class ChatRequest(BaseModel):
     message: str
 
+# --------------------------------------------------
+# RAINA Chat Endpoint
+# --------------------------------------------------
 @app.post("/api/raina_chat")
 async def raina_chat(req: ChatRequest):
+    """
+    Accepts a message, sends it to OpenAI, and returns RAINA's response.
+    Optionally triggers Render redeploy if API keys are set.
+    """
     try:
         # --- Chat Completion ---
         client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
@@ -28,7 +63,7 @@ async def raina_chat(req: ChatRequest):
         )
         reply = completion.choices[0].message.content
 
-        # --- Optional Render redeploy ---
+        # --- Optional Render Redeploy ---
         render_api_key = os.getenv("RENDER_API_KEY")
         render_service_id = os.getenv("RENDER_SERVICE_ID")
 
@@ -44,7 +79,7 @@ async def raina_chat(req: ChatRequest):
         else:
             redeploy_msg = "Render credentials missing; skipped redeploy."
 
-        # --- Final return payload ---
+        # --- Final Response ---
         return {
             "status": "success",
             "message": reply,
@@ -54,7 +89,9 @@ async def raina_chat(req: ChatRequest):
     except Exception as e:
         return {"status": "error", "message": str(e)}
 
-
+# --------------------------------------------------
+# Local Dev Entry Point
+# --------------------------------------------------
 if __name__ == "__main__":
     import uvicorn
     uvicorn.run("app:app", host="0.0.0.0", port=8000)
