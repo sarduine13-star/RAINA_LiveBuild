@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>RAINA Interface</title>
+  <style>
+    body { font-family: sans-serif; background: #111; color: #eee; padding: 2em; }
+    input, button { font-size: 1em; padding: 0.5em; margin: 0.5em 0; width: 100%; }
+    #reply { margin-top: 1em; white-space: pre-wrap; }
+  </style>
+</head>
+<body>
+  <h1>Talk to RAINA</h1>
+  <input id="userInput" placeholder="Type your message..." />
+  <button onclick="sendMessage()">Send</button>
+  <div id="reply"></div>
+  <audio id="audioPlayer" controls style="margin-top:1em;"></audio>
+
+  <script>
+    async function sendMessage() {
+      const msg = document.getElementById("userInput").value;
+      const res = await fetch("/api/raina_chat", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ message: msg })
+      });
+      const data = await res.json();
+      document.getElementById("reply").textContent = data.reply;
+
+      const audio = document.getElementById("audioPlayer");
+      audio.src = data.audio;
+      audio.play();
+    }
+  </script>
+</body>
+</html>
