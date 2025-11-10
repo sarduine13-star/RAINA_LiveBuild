@@ -1,84 +1,63 @@
-from fastapi import FastAPI, Request
-from pydantic import BaseModel
+import os
+import time
+from fastapi import FastAPI
 from fastapi.responses import JSONResponse
-from openai import OpenAI
 from dotenv import load_dotenv
-from gtts import gTTS
-import pygame, os, time, stripe
 
-# === Load Environment Variables ===
-load_dotenv(dotenv_path=r"C:\RAINA_LiveBuild\.env", override=True)
+# Load environment variables
+load_dotenv()
 
-# === Initialize Stripe ===
-STRIPE_SECRET_KEY = os.getenv("STRIPE_SECRET_KEY")
-STRIPE_PUBLISHABLE_KEY = os.getenv("STRIPE_PUBLISHABLE_KEY")
-stripe.api_key = STRIPE_SECRET_KEY
+# Import Stripe safely
+import stripe
+stripe.api_key = os.getenv("STRIPE_SECRET_KEY")
 
-# === Initialize FastAPI App ===
-app = FastAPI(title="RAINA + Stripe Backend")
-
-# === RAINA Chat Request Model ===
-class ChatRequest(BaseModel):
-    message: str
-
-@app.post("/api/raina_chat")
-async def raina_chat(req: ChatRequest):
+# Disable pygame on Render (no GUI/audio)
+if os.getenv("RENDER") != "true":
     try:
-        client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
-        completion = client.chat.completions.create(
-            model="gpt-4o-mini",
-            messages=[
-                {"role": "system", "content": "You are RAINA, Red’s live AI assistant."},
-                {"role": "user", "content": req.message},
-            ],
-        )
-        reply = completion.choices[0].message.content
-
-        # Voice reply
-        tts = gTTS(text=reply, lang='en')
-        file_path = "raina_reply.mp3"
-        tts.save(file_path)
-
-        pygame.mixer.init()
-        pygame.mixer.music.load(file_path)
-        pygame.mixer.music.play()
-        while pygame.mixer.music.get_busy():
-            time.sleep(0.5)
-        pygame.mixer.quit()
-
-        return {"response": reply, "audio_file": file_path}
-
+        import pygame
+        pygame.init()
+        print("Pygame initialized locally.")
     except Exception as e:
-        return {"error": str(e)}
+        print("Pygame failed to init:", e)
+else:
+    print("Running on Render: pygame disabled.")
 
-# === Stripe Payment Test Endpoint ===
+# Initialize FastAPI
+app = FastAPI(title="RAINA LiveBuild API", version="2.0")
+
+# --- ROUTES ---
+
+@app.get("/")
+def root():
+    return {"status": "Online ✅", "service": "RAINA + Stripe Integration"}
+
 @app.get("/api/stripe/test")
-async def stripe_test():
+def stripe_test():
+    """Check Stripe connection and list available balance if key valid."""
     try:
         balance = stripe.Balance.retrieve()
-        return {"status": "Connected ✅", "available": balance["available"]}
+        return {"status": "Connected ✅", "available": balance.get("available")}
     except Exception as e:
-        return JSONResponse(content={"error": str(e)}, status_code=500)
+        return JSONResponse(content={"status": "Error ❌", "detail": str(e)}, status_code=500)
 
-# === Stripe Checkout Session Creator ===
-@app.post("/api/create-checkout-session")
-async def create_checkout_session(request: Request):
+@app.get("/api/status")
+def status():
+    """Basic heartbeat check."""
+    return {"raina": "active", "timestamp": time.strftime("%Y-%m-%d %H:%M:%S")}
+
+@app.get("/api/info")
+def info():
+    """System info."""
+    return {
+        "environment": "Render" if os.getenv("RENDER") == "true" else "Local",
+        "stripe_key_set": bool(os.getenv("STRIPE_SECRET_KEY")),
+        "pygame_enabled": os.getenv("RENDER") != "true",
+    }
+
+# --- RUN LOCAL ---
+if __name__ == "__main__":
     try:
-        data = await request.json()
-        price_id = data.get("price_id")
-
-        session = stripe.checkout.Session.create(
-            payment_method_types=["card"],
-            line_items=[{"price": price_id, "quantity": 1}],
-            mode="subscription",
-            success_url="https://botguardpro-site.onrender.com/success",
-            cancel_url="https://botguardpro-site.onrender.com/cancel",
-        )
-        return {"url": session.url}
+        import uvicorn
+        uvicorn.run("app:app", host="0.0.0.0", port=int(os.getenv("PORT", 10000)))
     except Exception as e:
-        return JSONResponse(content={"error": str(e)}, status_code=400)
-
-# === Root Route ===
-@app.get("/")
-async def root():
-    return {"status": "RAINA + Stripe Live", "message": "Backend operational and connected."}
+        print(f"Failed to start app: {e}")
