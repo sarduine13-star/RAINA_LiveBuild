@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<link rel="manifest" href="manifest.json" />
+<link rel="icon" href="static/icon.png" />
+<title>RAINA Voice Assistant</title>
+<style>
+body {
+  font-family: Arial;
+  background: #0b0b0b;
+  color: #f0f0f0;
+  text-align: center;
+  margin: 0;
+  padding: 20px;
+}
+button {
+  background: #6f00ff;
+  color: #fff;
+  border: none;
+  padding: 12px 25px;
+  border-radius: 50%;
+  font-size: 1.5rem;
+  cursor: pointer;
+}
+.chatbox {
+  max-width: 600px;
+  margin: auto;
+  text-align: left;
+  background: #111;
+  padding: 15px;
+  border-radius: 10px;
+}
+.user,
+.raina {
+  margin: 10px 0;
+  padding: 10px;
+  border-radius: 10px;
+}
+.user {
+  background: #222;
+}
+.raina {
+  background: #191919;
+}
+</style>
+</head>
+<body>
+<h2>RAINA — Voice Assistant (Live)</h2>
+<div class="chatbox" id="chat"></div>
+<button id="mic">🎤</button>
+
+<script>
+const apiUrl = "https://raina-livebuild.onrender.com/api/raina_chat";
+const chat = document.getElementById("chat");
+const mic = document.getElementById("mic");
+
+async function recordAndSend() {
+  const text = prompt("Speak or type:");
+  if (!text) return;
+  addMsg("user", text);
+  try {
+    const res = await fetch(apiUrl, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ message: text }),
+    });
+    if (!res.ok) throw new Error("Backend unreachable");
+    const data = await res.json();
+    addMsg("raina", data.text || "No response.", data.audio_b64);
+  } catch (e) {
+    addMsg("raina", "Error connecting to RAINA backend.");
+  }
+}
+
+function addMsg(role, text, audioHex) {
+  const d = document.createElement("div");
+  d.className = role;
+  d.innerText = text;
+  chat.appendChild(d);
+  if (audioHex) {
+    const b = document.createElement("button");
+    b.textContent = "▶️";
+    b.onclick = () => play(audioHex);
+    chat.appendChild(b);
+  }
+}
+
+function play(hex) {
+  const bytes = new Uint8Array(hex.match(/.{1,2}/g).map(b => parseInt(b, 16)));
+  const blob = new Blob([bytes], { type: "audio/mpeg" });
+  new Audio(URL.createObjectURL(blob)).play();
+}
+
+mic.onclick = recordAndSend;
+</script>
+</body>
+</html>
